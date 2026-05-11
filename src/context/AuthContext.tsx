@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { 
-  getAuth, 
   onAuthStateChanged, 
   signInWithPopup, 
   GoogleAuthProvider, 
@@ -11,11 +10,8 @@ import {
   updateProfile,
   AuthError
 } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import firebaseConfig from '../../firebase-applet-config.json';
+import { auth } from '../lib/firebase';
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
 interface AuthContextType {

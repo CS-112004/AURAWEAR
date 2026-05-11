@@ -1,11 +1,13 @@
+import * as React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Product } from '../types';
 import { Button } from './ui/button';
 import { ShoppingBag } from 'lucide-react';
 
-interface ProductCardProps {
+export interface ProductCardProps {
   product: Product;
+  key?: string | number;
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
