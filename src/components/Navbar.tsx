@@ -8,10 +8,12 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { Input } from './ui/input';
 
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
   const { cartCount } = useCart();
+  const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const location = useLocation();
@@ -101,7 +103,7 @@ export default function Navbar() {
             <Globe className="w-5 h-5" />
           </Button>
 
-          <Link to="/profile">
+          <Link to={user ? "/profile" : "/login"}>
             <Button variant="ghost" size="icon">
               <User className="w-5 h-5" />
             </Button>

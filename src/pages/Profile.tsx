@@ -10,183 +10,23 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Profile() {
   const { 
     user, 
-    loginWithGoogle, 
-    loginWithEmail, 
-    registerWithEmail, 
     logout, 
     loading,
-    error,
-    clearError
   } = useAuth();
   const navigate = useNavigate();
-  const [isRegister, setIsRegister] = useState(false);
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    name: ''
-  });
-  const [authLoading, setAuthLoading] = useState(false);
+
+  React.useEffect(() => {
+    if (!loading && !user) {
+      navigate('/login');
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return <div className="pt-40 text-center animate-pulse font-mono tracking-widest uppercase text-gray-400">Initializing Profile...</div>;
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthLoading(true);
-    try {
-      if (isRegister) {
-        await registerWithEmail(formData.email, formData.password, formData.name);
-      } else {
-        await loginWithEmail(formData.email, formData.password);
-      }
-    } catch (err) {
-      // Error is handled in context
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (error) clearError();
-  };
-
   if (!user) {
-    return (
-      <div className="pt-32 pb-20 px-4 flex flex-col items-center justify-center min-h-[80vh]">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="w-full max-w-md bg-white border border-gray-100 p-8 md:p-12 shadow-sm"
-        >
-          <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 bg-gray-50 flex items-center justify-center rounded-full">
-              <User className="w-8 h-8 text-black" />
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-bold uppercase tracking-widest text-center mb-2">
-            {isRegister ? 'Join AURA' : 'Welcome Back'}
-          </h1>
-          <p className="text-gray-400 text-xs uppercase tracking-wider text-center mb-10 font-light">
-            {isRegister ? 'Create your minimalist space' : 'Enter your credentials to continue'}
-          </p>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <AnimatePresence mode="wait">
-              {isRegister && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="space-y-2"
-                >
-                  <Label htmlFor="name" className="text-[10px] uppercase tracking-widest font-bold text-gray-500">Full Name</Label>
-                  <div className="relative">
-                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input 
-                      id="name"
-                      name="name"
-                      type="text"
-                      placeholder="Jane Doe"
-                      required
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      className="pl-10 rounded-none border-gray-100 focus-visible:ring-black h-12"
-                    />
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-[10px] uppercase tracking-widest font-bold text-gray-500">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input 
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="name@example.com"
-                  required
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="pl-10 rounded-none border-gray-100 focus-visible:ring-black h-12"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-[10px] uppercase tracking-widest font-bold text-gray-500">Password</Label>
-                {!isRegister && (
-                  <button type="button" className="text-[9px] uppercase tracking-tighter text-gray-400 hover:text-black transition-colors">Forgot Password?</button>
-                )}
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <Input 
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="••••••••"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className="pl-10 rounded-none border-gray-100 focus-visible:ring-black h-12"
-                />
-              </div>
-            </div>
-
-            {error && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="bg-red-50 text-red-500 p-3 text-[11px] flex items-center gap-2"
-              >
-                <AlertCircle className="w-4 h-4 shrink-0" />
-                <span>{error}</span>
-              </motion.div>
-            )}
-
-            <Button 
-              type="submit" 
-              disabled={authLoading}
-              className="w-full rounded-none bg-black text-white h-14 uppercase tracking-[0.2em] font-bold hover:bg-gray-900 transition-all text-xs"
-            >
-              {authLoading ? 'Processing...' : (isRegister ? 'Register' : 'Sign In')}
-            </Button>
-          </form>
-
-          <div className="relative my-10">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-gray-100"></span>
-            </div>
-            <div className="relative flex justify-center text-[9px] uppercase tracking-widest">
-              <span className="bg-white px-4 text-gray-400">Or continue with</span>
-            </div>
-          </div>
-
-          <Button 
-            variant="outline" 
-            onClick={loginWithGoogle}
-            className="w-full rounded-none border-gray-100 h-14 flex items-center justify-center gap-3 hover:bg-gray-50 uppercase tracking-widest text-[10px] font-bold"
-          >
-            <Chrome className="w-4 h-4" /> Google
-          </Button>
-
-          <div className="mt-10 text-center">
-            <button 
-              onClick={() => { setIsRegister(!isRegister); clearError(); }}
-              className="text-[11px] font-medium tracking-wide text-gray-400 hover:text-black hover:underline underline-offset-4 transition-all"
-            >
-              {isRegister ? 'ALREADY HAVE AN ACCOUNT? LOGIN' : 'DON\'T HAVE AN ACCOUNT? REGISTER'}
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    );
+    return null; // Will redirect
   }
 
   const menuItems = [
